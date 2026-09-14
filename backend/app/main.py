@@ -11,6 +11,11 @@ from loguru import logger
 
 from . import __version__
 from .api import analytics, backtest, goal, journal, market, positions, signals, watchlist, ws
+from .api import analysis as analysis_router
+from .api import instruments as instruments_router
+from .api import replay as replay_router
+from .api import backtest_v2 as backtest_v2_router
+from .api import upload as upload_router
 from .api import settings_api as settings_router
 from .brokers.factory import provider_info
 from .config import settings
@@ -76,4 +81,9 @@ app.include_router(journal.router)
 app.include_router(analytics.router)
 app.include_router(settings_router.router)
 app.include_router(backtest.router)
+app.include_router(analysis_router.router)
+app.include_router(instruments_router.router)
+app.include_router(replay_router.router)
+app.include_router(backtest_v2_router.router)
+app.include_router(upload_router.router)
 app.include_router(ws.router)

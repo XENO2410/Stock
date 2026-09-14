@@ -236,3 +236,221 @@ export type ProviderInfo = {
   last_error?: string;
   effective?: string;
 };
+
+// ================ Analysis workspace (Phase 2) ================
+
+export type DataSource = "DEMO" | "SIMULATED" | "HISTORICAL" | "CSV" | "LIVE";
+
+export type AnalysisInstrument = {
+  symbol: string;
+  exchange: string;
+  trading_symbol: string;
+  display_name: string;
+  segment: string;
+  instrument_token?: string | null;
+  isin?: string | null;
+  currency: string;
+};
+
+export type TradePlan = {
+  entry_low: number;
+  entry_high: number;
+  stop: number;
+  target_1: number;
+  target_2: number;
+  risk_reward: number;
+};
+
+export type StructureEvent = {
+  timestamp: string;
+  type: "HH" | "HL" | "LH" | "LL" | "BOS_UP" | "BOS_DOWN" | "CHOCH_UP" | "CHOCH_DOWN";
+  price: number;
+  confidence: number;
+  reason: string;
+};
+
+export type Zone = {
+  price_low: number;
+  price_high: number;
+  strength: number;
+  reasons: string[];
+};
+
+export type TFEntry = {
+  timeframe: string;
+  direction: "up" | "down" | "sideways";
+  strength: number;
+};
+
+export type AnalysisReport = {
+  symbol: string;
+  timeframe: string;
+  source: DataSource;
+  price: number;
+  signal: "BUY" | "SELL" | "WAIT";
+  score: number;
+  bias: "up" | "down" | "neutral";
+  positive_evidence: string[];
+  negative_evidence: string[];
+  warnings: string[];
+  group_scores: Record<string, number>;
+  trade_plan: TradePlan | null;
+  summary: string;
+
+  trend: {
+    direction: "up" | "down" | "sideways";
+    strength: number;
+    ema9: number;
+    ema20: number;
+    ema50: number;
+    slope_pct: number;
+    reasons: string[];
+  };
+  momentum: {
+    rsi14: number;
+    macd: number;
+    macd_signal: number;
+    macd_hist: number;
+    roc10: number;
+    verdict: "bullish" | "bearish" | "neutral" | "overextended_up" | "overextended_down";
+    divergence: "bullish" | "bearish" | null;
+    reasons: string[];
+  };
+  volume: {
+    relative_volume: number;
+    is_spike: boolean;
+    trend: "expanding" | "contracting" | "steady";
+    confirms_move: boolean;
+    reasons: string[];
+  };
+  structure: {
+    bias: "up" | "down" | "undecided";
+    last_swing_high: number | null;
+    last_swing_low: number | null;
+    events: StructureEvent[];
+  };
+  breakout: {
+    kind?: "breakout_up" | "breakdown" | "retest" | "failed_breakout";
+    zone_mid?: number;
+    strength?: number;
+    reasons?: string[];
+  };
+  reversal: {
+    direction: "up" | "down" | null;
+    strength: number;
+    reasons: string[];
+  };
+  multi_timeframe: {
+    overall: "aligned_up" | "aligned_down" | "mixed" | "undecided";
+    alignment_score: number;
+    per_timeframe: TFEntry[];
+  };
+  support: Zone[];
+  resistance: Zone[];
+  candle_patterns: { name: string; bias: string; strength: number }[];
+};
+
+export type AnalysisWeights = {
+  groups: Record<string, number>;
+  bands: Record<string, [number, number]>;
+};
+
+// ================ Replay + Backtest (Phase 3) ================
+
+export type ReplaySessionState = {
+  id: string;
+  symbol: string;
+  primary_timeframe: string;
+  cursor: number;
+  total_candles: number;
+  current_timestamp: string | null;
+  current_close: number | null;
+  status: "paused" | "playing" | "finished";
+  speed: number;
+  available_timeframes: string[];
+  source: "CSV" | "SIMULATED";
+  train_frac: number;
+  in_sample_end_index: number;
+  in_sample: boolean;
+};
+
+export type CsvFile = {
+  file: string;
+  symbol: string;
+  timeframe: string;
+  size_bytes: number;
+  modified: string;
+};
+
+export type BacktestMetrics = {
+  total_trades: number;
+  winning_trades: number;
+  losing_trades: number;
+  win_rate: number;
+  gross_profit: number;
+  gross_loss: number;
+  net_pnl: number;
+  average_win: number;
+  average_loss: number;
+  profit_factor: number;
+  expectancy: number;
+  max_drawdown: number;
+  max_consecutive_losses: number;
+  max_consecutive_wins: number;
+  average_trade: number;
+  average_r: number;
+  median_r: number;
+  r_distribution: Record<string, number>;
+  buy_signals: number;
+  sell_signals: number;
+  wait_signals: number;
+  total_fees: number;
+  total_slippage: number;
+};
+
+export type BacktestTradeRow = {
+  symbol: string;
+  timeframe: string;
+  direction: "LONG" | "SHORT";
+  entry_index: number;
+  entry_time: string;
+  entry_price: number;
+  stop: number;
+  target: number;
+  quantity: number;
+  signal_score: number;
+  signal_reasons: string[];
+  exit_index: number | null;
+  exit_time: string | null;
+  exit_price: number | null;
+  reason: string | null;
+  resolution: string;
+  fees: number;
+  slippage: number;
+  pnl: number;
+  r_multiple: number;
+  in_sample: boolean;
+};
+
+export type BacktestResult = {
+  symbol: string;
+  timeframe: string;
+  total_candles: number;
+  warmup_bars: number;
+  train_frac: number;
+  train_end_index: number;
+  config: Record<string, unknown>;
+  overall: BacktestMetrics;
+  in_sample: BacktestMetrics;
+  out_of_sample: BacktestMetrics;
+  trades: BacktestTradeRow[];
+  signals_timeline: Array<{
+    index: number;
+    timestamp: string;
+    signal: "BUY" | "SELL" | "WAIT";
+    score: number;
+    bias: "up" | "down" | "neutral";
+    in_sample: boolean;
+  }>;
+  assumptions: Record<string, unknown>;
+};

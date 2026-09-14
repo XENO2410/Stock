@@ -7,9 +7,12 @@ import { fetcher } from "@/lib/api";
 import { cx, fmtPct } from "@/lib/utils";
 import type { MarketOverview, ProviderInfo } from "@/lib/types";
 import { useEffect, useState } from "react";
+import StockSearch from "@/components/analysis/StockSearch";
 
 const NAV = [
   { href: "/", label: "Dashboard" },
+  { href: "/analysis", label: "Analysis" },
+  { href: "/replay", label: "Replay" },
   { href: "/watchlist", label: "Watchlist" },
   { href: "/signals", label: "Signals" },
   { href: "/positions", label: "Positions" },
@@ -71,6 +74,10 @@ export default function Header() {
             );
           })}
         </nav>
+
+        <div className="hidden md:block flex-1 max-w-xs">
+          <StockSearch source="mock" placeholder="Analyse a stock…" />
+        </div>
 
         <div className="ml-auto flex items-center gap-4 text-xs">
           <div className="hidden lg:flex items-center gap-3 num">
