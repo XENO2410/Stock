@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+html, body {
+  height: 100%;
+  background-color: theme("colors.surface.alt");
+  color: theme("colors.ink.DEFAULT");
+  font-family: theme("fontFamily.sans");
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.dark html,
+.dark body,
+html.dark, body.dark {
+  background-color: theme("colors.surface.dark");
+  color: theme("colors.ink.inverse");
+}
+
+/* Compact numeric styling for tables */
+.num {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" on, "lnum" on;
+}
+
+.card {
+  @apply bg-white rounded-xl shadow-card border border-border;
+}
+
+.dark .card {
+  @apply bg-surface-dark-alt border-border-dark shadow-none;
+}
+
+.pill {
+  @apply inline-flex items-center px-2 py-0.5 rounded-md text-xs font-medium;
+}
+
+.pill-up { @apply bg-brand-light text-brand-dark; }
+.pill-down { @apply bg-red-50 text-down; }
+.pill-neutral { @apply bg-gray-100 text-neutral; }
+
+.dark .pill-up { @apply bg-brand/10 text-up; }
+.dark .pill-down { @apply bg-red-500/10 text-down; }
+.dark .pill-neutral { @apply bg-white/5 text-neutral; }
+
+/* Scrollbars */
+::-webkit-scrollbar { width: 8px; height: 8px; }
+::-webkit-scrollbar-thumb { background: #d3d7e0; border-radius: 4px; }
+.dark ::-webkit-scrollbar-thumb { background: #2a3244; }
+::-webkit-scrollbar-track { background: transparent; }
+
+.text-up { color: theme("colors.up"); }
+.text-down { color: theme("colors.down"); }
+
+.button {
+  @apply inline-flex items-center justify-center rounded-lg px-3 py-1.5 text-sm font-medium transition-colors;
+}
+.button-primary { @apply bg-brand text-white hover:bg-brand-dark; }
+.button-secondary { @apply bg-gray-100 hover:bg-gray-200 text-ink; }
+.dark .button-secondary { @apply bg-white/5 hover:bg-white/10 text-ink-inverse; }
+.button-danger { @apply bg-down/10 hover:bg-down/20 text-down; }
